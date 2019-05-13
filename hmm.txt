@@ -1,0 +1,6 @@
+<?= 
+$path = "/home/challshl/public_html/solver.txt";
+$open = fopen($path, "a+");
+fwrite($open, "ìž„ë‚˜ì—°\n");
+fclose($open);
+?>
