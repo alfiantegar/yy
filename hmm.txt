@@ -1,6 +1,45 @@
-<?= 
-$path = "/home/challshl/public_html/solver.txt";
-$open = fopen($path, "a+");
-fwrite($open, "ìž„ë‚˜ì—°\n");
-fclose($open);
-?>
+Hi guys,
+
+I know it is a pretty old post, but I get the solution, so if anybody also runs into that problem, he will get the solution too.
+
+When the error appears, it is related with a certain package which info is corrupted in the dpkg database. In my situation, I get the following :
+
+(Reading database ... 55%dpkg: unrecoverable fatal error, aborting:
+failed in buffer_read(fd): files list for package `kde-icons-oxygen': Input/output error
+E: Sub-process /usr/bin/dpkg returned an error code (2)
+
+So the solution is the following :
+
+1. Go into the /var/lib/dpkg directory
+2. Make a backup of the "status" file
+3. Edit the "status" file
+4. Search the package that gave the error
+5. Just delete the lines from this package (but let all other lines that concern other packages even if they contains the broken package in their "Replaces" or "Depends" fields)
+
+Personally, here are the lines that I deleted :
+
+Package: kde-icons-oxygen
+Status: purge ok installed
+Priority: optional
+Section: kde
+Installed-Size: 42952
+Maintainer: Kubuntu Developers <kubuntu-devel@lists.ubuntu.com>
+Architecture: all
+Source: oxygen-icons
+Version: 4:4.3.5-0ubuntu1~karmic1
+Replaces: dolphin (<< 4:4.1.86+svn902162), kdebase-data (<= 4:4.0.0-1), kmail (<< 4:4.3.2), libkdepim4 (<< 4:4.2.85), step (<< 4:4.3.0)
+Suggests: kdebase (>= 4:4.1.0-1)
+Description: Oxygen icon theme for KDE 4
+Oxygen is the standard icon theme for KDE 4.
+Homepage: http://www.kde.org/
+Original-Maintainer: Jonathan Riddell <jriddell@ubuntu.com>
+
+6. Save changes in the "status" file
+7. Run: sudo dpkg dpkg --configure -a
+8. Force the reinstallation of missing dependencies (because now, there are some) : sudo apt-get -f install
+I think that if the broken package does not depend on any other package (could be rare), just reinstall it : sudo apt-get install the_package
+9. Everything is fine now can update, upgrade, or install new packages !
+
+Hope this will help someone !
+Cheers,
+Gartss 
